@@ -53,15 +53,15 @@ local concat = table.concat
 local op = {
   continue = 0x0,
   text = 0x1,
-  -- 3 to 7 are reserved for further non-control frames
   binary = 0x2,
+  -- 3 to 7 are reserved for further non-control frames
   close = 0x8,
   ping = 0x9,
   pong = 0xa
   -- B to F are reserved for further control frames
 }
 
-local Client = { version = "0.1.0" }
+local Client = { version = "0.1.1" }
 Client.__index = Client
 
 function Client.new(address)
@@ -116,6 +116,7 @@ function Client:initConnection()
   end
 
   self.isConnected = true
+  remove(self.headers, #self.headers) -- remove \r\n
 
   return nil
 end
@@ -263,5 +264,11 @@ end
 --- Gets called when connection is closed
 function Client:onClose()
 end
+
+setmetatable(Client, {
+  __call = function(_, ...)
+    return Client.new(...)
+  end
+})
 
 return Client
